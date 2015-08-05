@@ -14,5 +14,6 @@ public class Bolt : MonoBehaviour {
 		rb = GetComponent<Rigidbody2D> ();
 		Vector2 move_vector = new Vector2 (transform.up.x, transform.up.y);
 		rb.velocity += move_vector * speed;
+		rb.velocity.Set (rb.velocity.x, rb.velocity.y);
 	}
 }

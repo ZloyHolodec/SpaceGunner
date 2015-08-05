@@ -52,9 +52,6 @@ public class ParallaxManager : MonoBehaviour {
 
 	private void initStars() {
 		Stars = new GameObject[starsCount];
-		float min_size = 0.1f;
-		float max_size = 1.0f;
-		float size_diff = max_size - min_size;
 		for (int i = 0; i < Stars.Length; i++) {
 			//Camera.main.ScreenToWorldPoint
 			float x = (Screen.width + spriteSize) * Random.value;

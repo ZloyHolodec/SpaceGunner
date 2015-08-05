@@ -3,37 +3,23 @@ using System.Collections;
 using System.Runtime.Serialization;
 
 public class PlayerMovement : MonoBehaviour {
-	[System.Serializable]
-	public class GunHardPod {
-		public Transform transform;
-		public Light light;
-	}
-
 	public float speed;
 	public float sidewaySpeed;
 	public float TorqueSpeed;
-	public GameObject Bolt;
-	public GunHardPod[] HardPods;
-	public float GunFlashRate;
 
 	public ParticleSystem EngineParticles;
 	public ParticleSystem LeftEngine;
 	public ParticleSystem RightEngine;
-	public float FireRate;
+
+	public MachineGuns Guns;
 	
 	private Rigidbody2D rb;
 	private Vector3 mouseLastPosition;
-	private float FireTime;
-	private float FlashDisableTime;
-	private int firePos;
-
 	public void Start() {
 		rb = GetComponent<Rigidbody2D> ();
 
 		mouseLastPosition = Input.mousePosition;
-		FireTime = Time.time + FireRate;
-		FlashDisableTime = 0;
-		firePos = 0;
+		Guns.Init (this);
 	}
 
 	public void FixedUpdate() {
@@ -43,7 +29,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	public void Update() {
 		Fire ();
-		disableLighs ();
+		Guns.Update (this);
 	}
 
 	private void MoveShip() {
@@ -62,27 +48,10 @@ public class PlayerMovement : MonoBehaviour {
 		LeftEngine.enableEmission = LeftRightAxis > 0;
 		RightEngine.enableEmission = LeftRightAxis < 0;
 	}
-
-	private void disableLighs() {
-		foreach (GunHardPod hard_pod in HardPods) {
-			hard_pod.light.enabled = Time.time < FlashDisableTime;
-		}
-	}
-
+	
 	private void Fire() {
-		if (Input.GetButton ("Fire1") && Time.time >= FireTime) {
-			FireTime = Time.time + FireRate;
-			FlashDisableTime = Time.time + GunFlashRate;
-
-			firePos++;
-			if (firePos >= HardPods.Length) firePos = 0;
-
-			Transform fire_position = HardPods[firePos].transform;
-			HardPods[firePos].light.enabled = true;
-
-			GameObject bolt = (GameObject)Instantiate(Bolt, fire_position.position, fire_position.rotation);
-			Rigidbody2D bolt_rb = bolt.GetComponent<Rigidbody2D>();
-			bolt_rb.velocity = rb.velocity.normalized;
+		if (Input.GetButton ("Fire1")) {
+			Guns.Fire(this);
 		}
 	}
 
