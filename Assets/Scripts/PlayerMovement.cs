@@ -3,28 +3,18 @@ using System.Collections;
 using System.Runtime.Serialization;
 
 public class PlayerMovement : MonoBehaviour {
-	public float speed;
-	public float sidewaySpeed;
-	public float TorqueSpeed;
-
-	public ParticleSystem EngineParticles;
-	public ParticleSystem LeftEngine;
-	public ParticleSystem RightEngine;
-
+	public Mover PlayerMover;
 	public MachineGuns Guns;
-	
-	private Rigidbody2D rb;
-	private Vector3 mouseLastPosition;
-	public void Start() {
-		rb = GetComponent<Rigidbody2D> ();
 
-		mouseLastPosition = Input.mousePosition;
+	public void Start() {
 		Guns.Init (this);
+		PlayerMover.Init (this);
 	}
 
 	public void FixedUpdate() {
 		TurnToMouse ();
 		MoveShip ();
+		PlayerMover.Update ();
 	}
 
 	public void Update() {
@@ -34,19 +24,13 @@ public class PlayerMovement : MonoBehaviour {
 
 	private void MoveShip() {
 		if (Input.GetAxisRaw ("Vertical") > 0) {
-			rb.AddForce (transform.up * speed * Time.deltaTime);
-			EngineParticles.enableEmission = true;
-		} else {
-			EngineParticles.enableEmission = false;
+			PlayerMover.Forward();
 		}
 
 		float LeftRightAxis = Input.GetAxisRaw ("Horizontal");
 		if (LeftRightAxis != 0) {
-			rb.AddForce(transform.right * LeftRightAxis * sidewaySpeed * Time.deltaTime);
+			PlayerMover.SideMove(LeftRightAxis);
 		}
-
-		LeftEngine.enableEmission = LeftRightAxis > 0;
-		RightEngine.enableEmission = LeftRightAxis < 0;
 	}
 	
 	private void Fire() {
@@ -56,13 +40,7 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	private void TurnToMouse() {
-		mouseLastPosition = Vector3.Lerp (mouseLastPosition, Input.mousePosition, TorqueSpeed * Time.deltaTime);
-		
-		Vector3 object_pos = Camera.main.WorldToScreenPoint(rb.position);
-		float x_diff = mouseLastPosition.x - object_pos.x;
-		float y_diff = mouseLastPosition.y - object_pos.y;
-		float angle = Mathf.Atan2(y_diff, x_diff) * Mathf.Rad2Deg - 90.0f;
-		
-		transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+		Vector3 mouse_pos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+		PlayerMover.TurnTo (mouse_pos);
 	}
 }
