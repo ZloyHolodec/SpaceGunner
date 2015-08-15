@@ -12,12 +12,8 @@ public class GunHardPod  {
 		Transform fire_position = transform;
 		light.enabled = true;
 
-		GameObject bolt = (GameObject)MonoBehaviour.Instantiate(Bolt, fire_position.position, fire_position.rotation);
-		Rigidbody2D bolt_rb = bolt.GetComponent<Rigidbody2D>();
+		GameObject bolt = (GameObject)MonoBehaviour.Instantiate (Bolt, fire_position.position, fire_position.rotation);
+		Rigidbody2D bolt_rb = bolt.GetComponent<Rigidbody2D> ();
 		bolt_rb.velocity = rb.velocity.normalized;
-	}
-
-	public void Update() {
-		Debug.Log("lll");
 	}
 }

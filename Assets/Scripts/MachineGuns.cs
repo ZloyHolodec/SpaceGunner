@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
 [System.Serializable]
-public class MachineGuns : CanShoot {	
+public class MachineGuns : CanShoot {
 	public float FireRate;
 	public float GunFlashRate;
 	
@@ -14,32 +15,32 @@ public class MachineGuns : CanShoot {
 	public MachineGuns() {
 	}
 
-	public override void Init(MonoBehaviour parent) {
+	public override void Init(NetworkBehaviour parent) {
 		FireTime = Time.time;
 		FlashDisableTime = Time.time;
 		firePos = 0;
+
 	}
 
-	public override void Fire(MonoBehaviour parent) {
+	public override void Fire(NetworkBehaviour parent) {
 		if (FireTime > Time.time)
 			return;
 
 		FireTime = Time.time + FireRate;
 		FlashDisableTime = Time.time + GunFlashRate;
-		
 		firePos++;
 		if (firePos >= HardPods.Length) firePos = 0;
 		
 		Transform fire_position = HardPods[firePos].transform;
 		HardPods[firePos].light.enabled = true;
-		
-		GameObject bolt = (GameObject)MonoBehaviour.Instantiate(HardPods[firePos].Bolt, fire_position.position, fire_position.rotation);
-		Rigidbody2D bolt_rb = bolt.GetComponent<Rigidbody2D>();
-		Rigidbody2D parent_rb = parent.GetComponent<Rigidbody2D> ();
-		bolt_rb.velocity = parent_rb.velocity.normalized;
+
+		GameObject bolt = MonoBehaviour.Instantiate(HardPods[firePos].Bolt, fire_position.position, fire_position.rotation) as GameObject;
+		Bolt bolt_manager = bolt.GetComponent<Bolt> ();
+		bolt_manager.rotation = fire_position.rotation;
+		//NetworkServer.Spawn (bolt);
 	}
 
-	public override void Update(MonoBehaviour parent) {
+	public override void Update(NetworkBehaviour parent) {			
 		disableLighs ();
 	}
 
